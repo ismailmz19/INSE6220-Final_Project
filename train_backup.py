@@ -28,7 +28,7 @@ parser.add_argument('--margin', type=int, default=2)
 parser.add_argument('--negsamp_ratio', type=int, default=2)
 parser.add_argument('--cutting', type=int, default=18)  # 3 5 8 10
 parser.add_argument('--N_tree', type=int, default=3)  # 3 5 8 10
-parser.add_argument('--lamda', type=float, default=0)  # 0  0.5  1
+parser.add_argument('--lamda', type=int, default=0)  # 0  0.5  1
 args = parser.parse_args()
 
 args.lr = 1e-5

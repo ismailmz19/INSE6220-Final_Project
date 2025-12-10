@@ -149,10 +149,18 @@ def calc_sim(adj_matrix, attr_matrix):
 
 
 def graph_nsgt(dis_array, adj):
-    dis_array = dis_array.cuda()
+    # move tensors to GPU only if CUDA is available
+    if torch.cuda.is_available():
+        dis_array = dis_array.cuda()
+        adj = adj.cuda()
+    else:
+        dis_array = dis_array.to('cpu')
+        adj = adj.to('cpu')
+
     row = dis_array.shape[0]
     dis_array_u = dis_array * adj
     mean_dis = dis_array_u[dis_array_u != 0].mean()
+
     for i in range(row):
         node_index = torch.argwhere(adj[i, :] > 0)
         if node_index.shape[0] != 0:
@@ -167,6 +175,7 @@ def graph_nsgt(dis_array, adj):
     adj = adj + adj.T
     adj[adj > 1] = 1
     return adj
+
 
 
 import matplotlib.pyplot as plt

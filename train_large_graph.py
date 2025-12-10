@@ -28,7 +28,7 @@ parser.add_argument('--margin', type=int, default=2)
 parser.add_argument('--negsamp_ratio', type=int, default=2)
 parser.add_argument('--cutting', type=int, default=8)  # 3 5 8 10
 parser.add_argument('--N_tree', type=int, default=1)  #
-parser.add_argument('--lamda', type=int, default=0)  # 0
+parser.add_argument('--lamda', type=float, default=0)  # 0
 args = parser.parse_args()
 
 args.lr = 1e-5
@@ -78,8 +78,8 @@ for i in range(args.cutting * args.N_tree):
     optimiser = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     if torch.cuda.is_available():
         model = model.cuda()
-        optimiser_list.append(optimiser)
-        model_list.append(model)
+    optimiser_list.append(optimiser)
+    model_list.append(model)
 
 criterion = nn.CrossEntropyLoss()
 if torch.cuda.is_available():
