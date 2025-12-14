@@ -1,94 +1,149 @@
-# Truncated Affinity Maximization: One-class Homophily Modeling for Graph Anomaly Detection (NeurIPS'23)
+INSE 6220 Course Project – Reproduction of Truncated Affinity Maximization (TAM) on the Amazon Dataset
 
-This repository is the official implementation of NeurIPS'23 paper "Truncated Affinity Maximization: One-class
-Homophily Modeling for Graph Anomaly Detection"
+Student: Ismail Mzouri
+Course: INSE 6220 – Advanced Statistical Approaches to Quality
+Institution: Concordia University
+Semester: Fall 2025
 
-The full paper can be found at [NeurIPS Portal](https://nips.cc/virtual/2023/poster/70486) or [arXiv](https://arxiv.org/pdf/2306.00006.pdf).
+This repository contains my course project reproduction of the paper
+“Truncated Affinity Maximization: One-class Homophily Modeling for Graph Anomaly Detection” (NeurIPS 2023) by Hezhe Qiao and Guansong Pang.
 
+The objective of this project is to reproduce, analyze, and validate the TAM methodology on a real-world graph anomaly detection dataset, following the experimental protocol of the original paper.
 
->📋  We explore the  property one class homophily to introduce a novel unsupervised anomaly scoring measure for GAD -- local node affinity -- that assigns a larger anomaly score to nodes that are less affiliated with their neighbors, with the affinity defined as similarity on node attributes/representations.
-We further propose Truncated Affinity Maximization (TAM) that learns tailored node representations for our anomaly measure by maximizing the local affinity of nodes to their neighbors.
-TAM is instead optimized on truncated graphs where non-homophily edges are removed iteratively to mitigate this bias. Extensive empirical results on six real-world GAD datasets show that TAM substantially outperforms seven competing models
->
->![homo](homo.png)
-![framework](framework.png)
-## Requirements
+The reproduction focuses exclusively on the Amazon co-review network dataset, which satisfies the INSE 6220 course requirements. Results on other datasets are reported only for contextual comparison and are taken directly from the original paper.
 
-To install requirements:
+This repository includes a complete, reproducible pipeline, statistical analysis, PCA exploration, baseline comparison, and all figures used in the final IEEE-formatted report.
 
-```setup
-pip install -r requirements.txt
-```
+My contributions:
 
+Reproduced the TAM pipeline on the Amazon dataset
 
->📋  TAM is implemented in Pytorch 1.6.0 with Python 3.7 and all the experiments are run on an NVIDIA GeForce RTX 3090 24GB GPU.  For large-scale graph datasets, like T-Finance and YelpChi-all, the experiments are run on NVIDIA A100 GPU for quickness. The experiments on OGB-Protein are run on the CPU.
+Achieved AUROC = 0.706 and AUPRC = 0.263, consistent with the original paper
 
-## Datasets
-> BlogCatalog and ACM were downloaded from https://github.com/yixinliu233/CoLA <br>
-> Amazon and Yelpchi were downloaded from  https://github.com/YingtongDou/CARE-GNN <br>
-> Amazon-all and Yelpchi-all were downloaded from  https://github.com/YingtongDou/CARE-GNN <br>
-> Facebook is obtained from  https://github.com/zhiming-xu/conad <br>
-> Reddit is downloaded from https://github.com/pygod-team/data  <br>
-> T-finance is downloaded from https://drive.google.com/drive/folders/1PpNwvZx_YRSCDiHaBUmRIS3x1rZR7fMr <br>
-> OGB-Protein is downloaded from https://ogb.stanford.edu/docs/nodeprop/#ogbn-arxiv <br>
-For convenience, all the datasets can be obtained from  https://drive.google.com/drive/folders/1qcDBcVdcfAr_q5VOXBYagtnhA_r3Mm3Z?usp=drive_link
+Implemented an Isolation Forest baseline for comparison
 
-## Training
+Conducted Principal Component Analysis (PCA) on the Amazon dataset
 
-To train the model(s) in the paper, run this command:
+Generated all plots and figures used in the report
 
-```train
-python train.py
-```
+Provided a fully reproducible notebook-based workflow
 
->📋  In TAM, each LAMNet is implemented by a two-layer GCN, and its weight parameters are optimized using Adam optimizer with 500 epochs and a learning rate of 1e-5 by default.  T=3 and K=4 are used for all datasets. Datasets with injected anomalies, such as BlogCatalog, ACM and Facebook, require strong regularization, so $\lambda=1$ is used by default; whereas $\lambda=0$ is used for the four real-world datasets.
-For the larger datasets like Amazon-all, YelpChi-all, and OGB-Protein, they require larger truncation times  due to the large number of edges. So we set K = 7.
-## Evaluation
+To reproduce the results, first install the dependencies using the provided requirements file.
 
-To evaluate our model on datasets,  run:
+Install dependencies:
+pip install -r requirements_current.txt
 
-```eval
-python train.py 
-```
+You can then run the reproduction using one of the following options.
 
-## Dataset
-| Dataset | Nodes | Edges      | Attributes         | Anomalies(Rate) |
-|--------|-------------|----------|----------------|----------|
-| BlogCatalog  | 5,196 | 171,743  | 8,189 |300(5.77%)   |  
-| ACM  |16,484| 71,980| 8,337| 597(3.63%)|
-| Amazon(UPU)  |10244| 175,608 |25| 693(6.66%)|
-| Facebook  |1,081 | 55,104|  576| 27(2.49%)|
-| Reddit  |10,984| 168,016| 64 | 366(3.33%)|
-| YelpChi (RUR)  |24,741| 49,315| 32| 1,217(4.91%)|
-| Amazon-all  |11,944 |4,398,392| 25| 821(6.87%)|
-| YelpChi-all |45,941 | 3,846,979 |32 |6,674(14.52%)|
-| T-Finance |39,357| 21,222,543| 10|1,803 (4.58%)|
-| OGB-Protein |132,534  | 39,561,252| 8| 6000(4.5%)|
-## Results
-Our model achieves the following performance on :
+Notebook-based execution (recommended):
+jupyter notebook Amazon_TAM.ipynb
 
-| Metric | BlogCatalog | ACM      | Amazon         | Facebook | Reddit | YelpChi | Amazon-all | YelpChi-all |T-finance | OGB-Protein |
-|--------|-------------|----------|----------------|----------|--------|--------|--------|--------|--------|--------|
-| AUROC  | 0.8248      | 0.8878   | 0.7064         | 0.9144   | 0.6023 | 0.5643 |0.8476 |0.5818	|0.6175|	0.7449|
-| AUPRC  | 0.4182      | 0.5124   | 0.2634   | 0.2233  | 0.0446 | 0.0778 |0.4346|	0.1886|	0.0547	|0.2173|
+Command-line execution:
+python train.py --dataset Amazon
 
+The expected output should be approximately:
+AUROC ≈ 0.706
+AUPRC ≈ 0.263
 
-## Main Contributions
-We reveal an important anomaly-discriminative property, the one-class homophily, in GAD datasets with either injected or real anomalies. We utilize this property to introduce a novel unsupervised GAD measure, local node affinity, and further introduce a truncated affinity maximization (TAM) approach that end-to-end optimizes the proposed anomaly measure on truncated adjacency  matrix with the non-homophily edges eliminated
+Training logs are saved in:
+tam_amazon_log.txt
 
+Reproduction results on the Amazon dataset:
 
+Method: Isolation Forest
+AUROC: 0.562
+AUPRC: 0.137
+Description: Attribute-only baseline
 
+Method: TAM (This Reproduction)
+AUROC: 0.706
+AUPRC: 0.263
+Description: Structure-aware graph anomaly detection
 
-## Citation
+Key observations:
 
-If you use this package and find it useful, please cite our paper using the following BibTeX. Thanks! :)
+TAM improves AUROC by 14.4 percentage points over the baseline
 
-```bibtex
+PCA shows that approximately 20 principal components capture 90% of variance
+
+Normal nodes form dense clusters while anomalies appear scattered
+
+Results validate the one-class homophily hypothesis on real-world fraud data
+
+Repository structure:
+
+Amazon_TAM.ipynb: Complete reproduction notebook
+
+tam_amazon_log.txt: Training logs
+
+figures/: PCA plots and performance visualizations
+
+model.py: LAMNet implementation
+
+train.py: TAM training pipeline
+
+utils.py: Graph preprocessing utilities
+
+degree_nsgt.py: NSGT implementation
+
+raw_affinity.py: Local affinity computation
+
+dis_statistic.py: Distance statistics analysis
+
+data/: Amazon dataset files
+
+Dataset information:
+
+Dataset: Amazon (UPU)
+Nodes: 10,244
+Edges: 175,608
+Attributes: 25
+Anomalies: 693 (6.66%)
+
+Nodes represent products, edges represent co-reviewed products, and anomalies correspond to products associated with fraudulent reviews.
+
+Methodology summary:
+
+Local node affinity measures similarity between nodes and their neighbors
+
+LAMNet (2-layer GCN) learns representations by maximizing local affinity
+
+NSGT probabilistically removes non-homophily edges
+
+An ensemble is built using multiple truncation depths and runs
+
+Hyperparameters used for the Amazon dataset:
+
+GCN layers: 2
+
+Hidden dimension: 64
+
+Learning rate: 1e-5
+
+Epochs: 500
+
+Truncation depth K: 4
+
+Ensemble size T: 3
+
+Regularization λ: 0 (real anomalies)
+
+All code, logs, figures, and configurations required to reproduce the Amazon dataset results are included in this repository. The project was executed in a course-level computing environment and follows the original paper’s experimental protocol for the Amazon dataset.
+
+This work builds upon the official implementation of:
+Truncated Affinity Maximization: One-class Homophily Modeling for Graph Anomaly Detection
+NeurIPS 2023
+https://arxiv.org/pdf/2306.00006.pdf
+
+The original paper reports results on multiple benchmark datasets (BlogCatalog, ACM, Facebook, Reddit, YelpChi, Amazon-all, YelpChi-all, T-Finance, OGB-Protein). Only the Amazon dataset is reproduced here.
+
+If you use this work, please cite the original paper:
+
 @inproceedings{qiao2023truncated,
-  title={Truncated Affinity Maximization: One-class Homophily Modeling for Graph Anomaly Detection},
-  author={Qiao, Hezhe and Pang, Guansong},
-  booktitle={Advances in Neural Information Processing Systems},
-  year={2023}
+title={Truncated Affinity Maximization: One-class Homophily Modeling for Graph Anomaly Detection},
+author={Qiao, Hezhe and Pang, Guansong},
+booktitle={Advances in Neural Information Processing Systems},
+year={2023}
 }
-```
 
+This repository is submitted as part of INSE 6220 – Advanced Statistical Approaches to Quality at Concordia University and is intended for educational and reproducibility purposes only.
