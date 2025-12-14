@@ -1,10 +1,9 @@
 import numpy as np
-import networkx as nx
 import scipy.sparse as sp
 import torch
 import scipy.io as sio
 import random
-import dgl
+#import dgl
 
 def sparse_to_tuple(sparse_mx, insert_batch=False):
     """Convert sparse matrix to tuple representation."""
@@ -108,30 +107,38 @@ def load_mat(dataset):
     return adj, feat, ano_labels, str_ano_labels, attr_ano_labels
 
 
-def adj_to_dgl_graph(adj):
-    """Convert adjacency matrix to dgl format."""
-    nx_graph = nx.from_scipy_sparse_matrix(adj)
-    dgl_graph = dgl.DGLGraph(nx_graph)
-    return dgl_graph
+
 
 
 # compute the distance between each node
 def calc_distance(adj, seq):
-    dis_array = torch.zeros((adj.shape[0], adj.shape[1]))
-    row = adj.shape[0]
-    for i in range(row):
-        print(i)
-        node_index = torch.argwhere(adj[i, :] > 0)
-        for j in node_index:
-            dis = torch.sqrt(torch.sum((seq[i] - seq[j]) * (seq[i] - seq[j])))
-            dis_array[i][j] = dis
+    adj = adj.cuda()
+    seq = seq.cuda()
+
+    N = adj.shape[0]
+    dis_array = torch.zeros((N, N), device="cuda")
+
+    print("=== Starting calc_distance ===")
+    for i in range(N):
+
+        # guaranteed progress print
+        if i % 100 == 0 or i == N-1:
+            print(f"calc_distance progress: {i}/{N}")
+
+        neighbors = torch.nonzero(adj[i] > 0, as_tuple=False).flatten()
+
+        if len(neighbors) == 0:
+            continue
+
+        diffs = seq[i] - seq[neighbors]
+        dists = torch.norm(diffs, dim=1)
+
+        dis_array[i, neighbors] = dists
+
+    print("=== Finished calc_distance ===")
     return dis_array
 
 
-def get_cos_similar(v1: list, v2: list):
-    num = float(np.dot(v1, v2))  # 向量点乘
-    denom = np.linalg.norm(v1) * np.linalg.norm(v2)  # 求模长的乘积
-    return 0.5 + 0.5 * (num / denom) if denom != 0 else 0
 
 
 def calc_sim(adj_matrix, attr_matrix):

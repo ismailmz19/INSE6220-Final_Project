@@ -9,9 +9,11 @@ import argparse
 from tqdm import tqdm
 import time
 
-os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(map(str, [3]))
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # use GPU 0
 os.environ["KMP_DUPLICATE_LnIB_OK"] = "TRUE"
-device_ids = [3]
+device_ids = [0]
+
+
 # Set argument
 parser = argparse.ArgumentParser(description='Truncated Affinity Maximization for Graph Anomaly Detection')
 parser.add_argument('--dataset', type=str,
@@ -33,6 +35,7 @@ args = parser.parse_args()
 
 args.lr = 1e-5
 args.num_epoch = 500
+
 
 print('Dataset: ', args.dataset)
 
@@ -59,7 +62,7 @@ else:
     raw_features = features.todense()
     features = raw_features
 
-dgl_graph = adj_to_dgl_graph(adj)
+## dgl_graph removed
 nb_nodes = features.shape[0]
 ft_size = features.shape[1]
 raw_adj = adj
@@ -141,8 +144,9 @@ def inference(feature, adj_matrix):
 
 start = time.time()
 # Train model
-with tqdm(total=args.num_epoch) as pbar:
+with tqdm(total=args.num_epoch * args.cutting * args.N_tree) as pbar:
     pbar.set_description('Training')
+
 
     score_list = []
     new_adj_list = []
@@ -181,6 +185,7 @@ with tqdm(total=args.num_epoch) as pbar:
                 optimiser_list[index].step()
 
                 loss = loss.detach().cpu().numpy()
+                pbar.update(1)
 
                 if epoch % 50 == 0:
                     print("mean_loss is {}".format(loss))
